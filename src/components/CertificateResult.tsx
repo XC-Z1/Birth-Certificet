@@ -86,15 +86,24 @@ export const CertificateResult: React.FC<CertificateResultProps> = ({
     try {
       const element = certificateRef.current;
       
+      // Temporarily attach export styling class to force official light document mode during html2canvas render
+      element.classList.add('exporting-pdf');
+
+      // Short delay for DOM styling to apply
+      await new Promise((resolve) => setTimeout(resolve, 60));
+
       const canvas = await html2canvas(element, {
-        scale: 2,
+        scale: 3,
         useCORS: true,
         logging: false,
         backgroundColor: '#FFFFFF',
-        windowWidth: 1200,
+        windowWidth: 1000,
+        ignoreElements: (el) => el.classList.contains('no-print') || el.hasAttribute('data-no-pdf')
       });
 
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      element.classList.remove('exporting-pdf');
+
+      const imgData = canvas.toDataURL('image/png');
 
       const pdf = new jsPDF({
         orientation: 'portrait',
@@ -102,10 +111,17 @@ export const CertificateResult: React.FC<CertificateResultProps> = ({
         format: 'a4',
       });
 
+      pdf.setProperties({
+        title: `BD_Birth_Certificate_${data.brn || 'record'}`,
+        subject: 'Official Birth Registration Verification Certificate',
+        author: 'Government of Bangladesh - Birth and Death Registration Office',
+        creator: 'Bangladesh Birth Registration Portal'
+      });
+
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
 
-      const margin = 10;
+      const margin = 8; // Official Standard Margin
       const printableWidth = pdfWidth - margin * 2;
       const printableHeight = pdfHeight - margin * 2;
 
@@ -123,10 +139,15 @@ export const CertificateResult: React.FC<CertificateResultProps> = ({
       const xOffset = margin + (printableWidth - finalWidth) / 2;
       const yOffset = margin;
 
-      pdf.addImage(imgData, 'JPEG', xOffset, yOffset, finalWidth, finalHeight);
+      pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight, undefined, 'FAST');
       pdf.save(`BD_Birth_Certificate_${data.brn || 'record'}.pdf`);
+      
+      onCopyField('পিডিএফ ডাউনলোড', 'অফিসিয়াল জন্ম সনদ পিডিএফ ফাইল সফলভাবে ডাউনলোড হয়েছে');
     } catch (error) {
       console.error('PDF generation error:', error);
+      if (certificateRef.current) {
+        certificateRef.current.classList.remove('exporting-pdf');
+      }
       window.print();
     } finally {
       setIsDownloadingPdf(false);
@@ -357,11 +378,17 @@ Name (En): ${data.nameEnglish || 'N/A'}
             প্রিন্ট করুন
           </button>
 
-          {/* Social Media Share Modal Opener */}
+          {/* Social Media & Mobile Native Web Share */}
           <button
-            onClick={() => setShowShareModal(true)}
+            onClick={() => {
+              if (typeof navigator !== 'undefined' && navigator.share) {
+                handleNativeShare();
+              } else {
+                setShowShareModal(true);
+              }
+            }}
             className="px-3.5 py-2 rounded-xl bg-indigo-100 dark:bg-indigo-950/60 text-indigo-900 dark:text-indigo-200 hover:bg-indigo-200 border border-indigo-300 dark:border-indigo-800 font-bengali text-xs font-semibold flex items-center gap-1.5 transition-colors"
-            title="হোয়াটসঅ্যাপ, ফেসবুক ও ইমেইলে শেয়ার করুন"
+            title="মোবাইল শেয়ার বা সোশ্যাল মিডিয়ায় শেয়ার করুন"
           >
             <Share2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
             শেয়ার করুন
@@ -466,7 +493,7 @@ Name (En): ${data.nameEnglish || 'N/A'}
 
           <button
             onClick={() => handleCopyFieldText('BRN', data.brn || '')}
-            className="px-3.5 py-1.5 rounded-lg bg-[#d4af37] text-slate-950 hover:bg-amber-300 text-xs font-bold font-bengali flex items-center gap-1.5 transition-colors shadow"
+            className="no-print px-3.5 py-1.5 rounded-lg bg-[#d4af37] text-slate-950 hover:bg-amber-300 text-xs font-bold font-bengali flex items-center gap-1.5 transition-colors shadow"
           >
             {copiedField === 'BRN' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
             {copiedField === 'BRN' ? 'কপি হয়েছে' : 'BRN কপি'}
@@ -1090,7 +1117,7 @@ const FieldRow: React.FC<FieldRowProps> = ({ labelBangla, labelEnglish, value, o
 
       <button
         onClick={onCopy}
-        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-emerald-600 transition-opacity border border-slate-200 dark:border-slate-700 shadow-sm"
+        className="no-print opacity-0 group-hover:opacity-100 p-1.5 rounded-md bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-emerald-600 transition-opacity border border-slate-200 dark:border-slate-700 shadow-sm"
         title={`${labelBangla} কপি করুন`}
       >
         <Copy className="w-3.5 h-3.5" />

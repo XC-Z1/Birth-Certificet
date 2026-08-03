@@ -6,6 +6,7 @@ import { CertificateResult } from './components/CertificateResult';
 import { HistorySidebar } from './components/HistorySidebar';
 import { SkeletonLoader } from './components/SkeletonLoader';
 import { Footer } from './components/Footer';
+import { AboutModal } from './components/AboutModal';
 import { BirthRecordResponse, SearchHistoryItem } from './types';
 import { playSuccessChime } from './utils/audio';
 import { AlertTriangle, CheckCircle2, X, Shield, Users, Search, FileCheck2 } from 'lucide-react';
@@ -20,6 +21,7 @@ export default function App() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [resultData, setResultData] = useState<BirthRecordResponse | null>(null);
+  const [isAboutOpen, setIsAboutOpen] = useState<boolean>(false);
   
   const [history, setHistory] = useState<SearchHistoryItem[]>(() => {
     try {
@@ -224,6 +226,13 @@ Name (English): ${resultData.nameEnglish || 'N/A'}
         searchCounter={searchCounter}
         onOpenHistory={() => setIsSidebarOpen(true)}
         favoriteCount={favoriteCount}
+        onOpenAbout={() => setIsAboutOpen(true)}
+      />
+
+      {/* About & Usage Guide Modal */}
+      <AboutModal
+        isOpen={isAboutOpen}
+        onClose={() => setIsAboutOpen(false)}
       />
 
       {/* History & Favorites Drawer Sidebar */}
@@ -244,24 +253,30 @@ Name (English): ${resultData.nameEnglish || 'N/A'}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         
         {/* Portal Notice Banner */}
-        <div className="no-print bg-emerald-900/10 dark:bg-emerald-900/30 border border-emerald-800/20 dark:border-emerald-600/30 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+        <div className="no-print bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
           <div className="flex items-center space-x-3">
-            <div className="p-2.5 bg-emerald-700 text-amber-300 rounded-lg shrink-0">
+            <div className="p-2 bg-emerald-50 dark:bg-emerald-950 text-[#006a4e] dark:text-emerald-400 rounded-xl shrink-0">
               <Shield className="w-5 h-5" />
             </div>
             <div>
-              <p className="font-bold text-sm text-emerald-950 dark:text-emerald-200">
-                জন্ম ও মৃত্যু নিবন্ধন তথ্য যাচাইকরণ নিরাপদ প্রক্সি পোর্টাল
-              </p>
-              <p className="text-xs text-slate-600 dark:text-slate-400">
-                সুরক্ষিত এনক্রিপ্টেড ব্যাকএন্ড প্রক্সি ব্যবহার করে সরাসরি সরকারি ডেটাবেজ যাচাইকরণ।
+              <div className="flex items-center gap-2">
+                <p className="font-bold text-sm text-slate-900 dark:text-slate-100">
+                  অনলাইন জন্ম নিবন্ধন তথ্য যাচাইকরণ পোর্টালে স্বাগতম
+                </p>
+                <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-[10px] font-bold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  অনলাইন সক্রিয়
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                নিরাপদ ও তাৎক্ষণিক অনলাইন তথ্য যাচাইকরণ সেবা।
               </p>
             </div>
           </div>
 
-          <div className="flex items-center space-x-2 text-xs font-mono font-semibold bg-white/80 dark:bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-emerald-800 dark:text-emerald-300 shrink-0">
-            <Search className="w-3.5 h-3.5" />
-            <span>মোট যাচাই সম্পন্ন: {searchCounter.toLocaleString('bn-BD')}</span>
+          <div className="flex items-center space-x-2 text-xs font-mono font-bold bg-slate-50 dark:bg-slate-800 px-3.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-emerald-800 dark:text-emerald-300 shrink-0">
+            <Search className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <span>মোট সফল অনুসন্ধান: {searchCounter.toLocaleString('bn-BD')}</span>
           </div>
         </div>
 
@@ -316,41 +331,41 @@ Name (English): ${resultData.nameEnglish || 'N/A'}
 
         {/* Information FAQs Section when no active search result */}
         {!resultData && !isLoading && (
-          <div className="no-print mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="no-print mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
             
-            <div className="p-5 rounded-2xl glass-card border border-emerald-900/10 dark:border-slate-800 space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 flex items-center justify-center">
+            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2.5 shadow-sm">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-[#006a4e] dark:text-emerald-400 flex items-center justify-center">
                 <FileCheck2 className="w-5 h-5" />
               </div>
-              <h4 className="font-bold text-base text-slate-900 dark:text-slate-100">
-                ১৭ ডিজিট আবশ্যক
+              <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 font-bengali">
+                ১৭ ডিজিটের ডিজিটাল BRN
               </h4>
-              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                জন্ম নিবন্ধন নম্বরটি অবশ্যই ১৭ ডিজিটের হতে হবে। পুরনো ১৬ বা ১৩ ডিজিটের নম্বর হলে স্থানীয় নিবন্ধন অফিসে যোগাযোগ করুন।
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-bengali">
+                জন্ম নিবন্ধন নম্বরটি ১৭ সংখ্যার হওয়া আবশ্যক। পুরনো বা এনালগ সনদের ক্ষেত্রে নিবন্ধন অফিস হতে ১৭ ডিজিট সংগ্রহ করুন।
               </p>
             </div>
 
-            <div className="p-5 rounded-2xl glass-card border border-emerald-900/10 dark:border-slate-800 space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 flex items-center justify-center">
+            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2.5 shadow-sm">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-[#006a4e] dark:text-emerald-400 flex items-center justify-center">
                 <Users className="w-5 h-5" />
               </div>
-              <h4 className="font-bold text-base text-slate-900 dark:text-slate-100">
-                পিতা-মাতার তথ্য
+              <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 font-bengali">
+                অভিভাবক ও স্থান বিবরণ
               </h4>
-              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                সার্চের মাধ্যমে অর্জিত সনদে পিতা ও মাতার নাম, জাতীয়তা, জন্ম স্থান ও নিবন্ধন কার্যালয়ের বিবরণ সুবিন্যস্ত থাকে।
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-bengali">
+                যাচাইকৃত সনদে পিতা-মাতার নাম, জাতীয়তা, নিবন্ধন কার্যালয়ের সঠিক তথ্য বাংলা ও ইংরেজি উভয় ভাষায় পাওয়া যায়।
               </p>
             </div>
 
-            <div className="p-5 rounded-2xl glass-card border border-emerald-900/10 dark:border-slate-800 space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 flex items-center justify-center">
+            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2.5 shadow-sm">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-[#006a4e] dark:text-emerald-400 flex items-center justify-center">
                 <Shield className="w-5 h-5" />
               </div>
-              <h4 className="font-bold text-base text-slate-900 dark:text-slate-100">
-                নিরাপদ ও এনক্রিপ্টেড
+              <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 font-bengali">
+                নিরাপদ যাচাইকরণ
               </h4>
-              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                আপনার ব্রাউজার বা ডিভাইসে কোনো গোপন সংবেদনশীল তথ্য অনুপযুক্তভাবে উন্মুক্ত হয় না। সকল অনুসন্ধান ব্যাকএন্ড প্রক্সির মাধ্যমে সুরক্ষিত।
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-bengali">
+                পোর্টালটি আপনার সংবেদনশীল ব্যক্তিগত তথ্য গোপন রাখে এবং নিরাপদে ব্রাউজারে ফলাফল প্রদর্শন করে।
               </p>
             </div>
 

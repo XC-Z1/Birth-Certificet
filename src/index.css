@@ -175,6 +175,48 @@
   }
 }
 
+/* Dedicated CSS rules for canvas & PDF export */
+.certificate-print-area.exporting-pdf {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border: 10px double #006a4e !important;
+  outline: 3px solid #d4af37 !important;
+  outline-offset: -6px !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+}
+
+.certificate-print-area.exporting-pdf * {
+  color: #0f172a !important;
+}
+
+.certificate-print-area.exporting-pdf .text-\[\#006a4e\],
+.certificate-print-area.exporting-pdf .text-emerald-950,
+.certificate-print-area.exporting-pdf .dark\:text-emerald-300,
+.certificate-print-area.exporting-pdf .dark\:text-emerald-100,
+.certificate-print-area.exporting-pdf .dark\:text-emerald-400 {
+  color: #006a4e !important;
+}
+
+.certificate-print-area.exporting-pdf .bg-slate-50\/90,
+.certificate-print-area.exporting-pdf .dark\:bg-slate-800\/90 {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+}
+
+.certificate-print-area.exporting-pdf .bg-gradient-to-r {
+  background: linear-gradient(to right, #006a4e, #064e3b, #022c22) !important;
+}
+
+.certificate-print-area.exporting-pdf .text-amber-300,
+.certificate-print-area.exporting-pdf .text-amber-400 {
+  color: #d4af37 !important;
+}
+
+.certificate-print-area.exporting-pdf .no-print {
+  display: none !important;
+}
+
 /* Custom Styled React Datepicker for Government Green Theme */
 .react-datepicker-wrapper {
   width: 100%;
