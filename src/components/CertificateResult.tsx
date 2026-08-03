@@ -161,7 +161,7 @@ export const CertificateResult: React.FC<CertificateResultProps> = ({
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
 
-      const margin = 8; // Official Standard Margin
+      const margin = 6; // Standard 6mm margin for optimal single-page fit
       const printableWidth = pdfWidth - margin * 2;
       const printableHeight = pdfHeight - margin * 2;
 
@@ -177,7 +177,7 @@ export const CertificateResult: React.FC<CertificateResultProps> = ({
       }
 
       const xOffset = margin + (printableWidth - finalWidth) / 2;
-      const yOffset = margin;
+      const yOffset = margin + (printableHeight - finalHeight) / 2;
 
       pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight, undefined, 'NONE');
       pdf.save(`BD_Birth_Certificate_${data.brn || 'record'}.pdf`);
