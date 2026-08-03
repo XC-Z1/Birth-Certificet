@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import DatePicker from 'react-datepicker';
-import { Search, RotateCcw, Calendar, FileText, AlertCircle, ShieldAlert, Sparkles, X } from 'lucide-react';
+import { Search, RotateCcw, Calendar, FileText, AlertCircle, ShieldAlert, Sparkles } from 'lucide-react';
 
 interface SearchFormProps {
   onSearch: (brn: string, dob: string) => void;
@@ -13,20 +12,6 @@ export const SearchForm: React.FC<SearchFormProps> = ({ onSearch, isLoading, onR
   const [dob, setDob] = useState('');
   const [brnError, setBrnError] = useState('');
   const [dobError, setDobError] = useState('');
-
-  const selectedDate = dob ? new Date(dob + 'T00:00:00') : null;
-
-  const handleDateChange = (date: Date | null) => {
-    if (date) {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      setDob(`${year}-${month}-${day}`);
-    } else {
-      setDob('');
-    }
-    if (dobError) setDobError('');
-  };
 
   const validateForm = (): boolean => {
     let isValid = true;
@@ -140,46 +125,26 @@ export const SearchForm: React.FC<SearchFormProps> = ({ onSearch, isLoading, onR
             )}
           </div>
 
-          {/* Date of Birth Picker with react-datepicker */}
+          {/* Date of Birth Input */}
           <div className="space-y-2">
             <label htmlFor="dob-input" className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider font-bengali">
               জন্ম তারিখ (Date of Birth) <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
-              <DatePicker
+              <input
                 id="dob-input"
-                selected={selectedDate}
-                onChange={handleDateChange}
-                dateFormat="yyyy-MM-dd"
-                placeholderText="YYYY-MM-DD নির্বাচন করুন"
-                showYearDropdown
-                showMonthDropdown
-                dropdownMode="select"
-                maxDate={new Date()}
-                minDate={new Date('1900-01-01')}
-                scrollableYearDropdown
-                yearDropdownItemNumber={120}
-                disabled={isLoading}
-                className={`w-full px-4 py-3.5 pr-10 rounded-xl bg-slate-50 dark:bg-slate-800/80 border ${
+                type="date"
+                value={dob}
+                onChange={(e) => {
+                  setDob(e.target.value);
+                  if (dobError) setDobError('');
+                }}
+                className={`w-full px-4 py-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border ${
                   dobError ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-200 dark:border-slate-700 focus:border-[#006a4e] focus:ring-[#006a4e]'
-                } text-slate-900 dark:text-slate-100 font-mono focus:outline-none focus:ring-2 transition-all text-base sm:text-lg cursor-pointer`}
+                } text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 transition-all text-base sm:text-lg`}
+                disabled={isLoading}
               />
-              <div className="absolute right-3 top-3.5 flex items-center gap-1.5 pointer-events-none">
-                {dob && (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setDob('');
-                    }}
-                    className="pointer-events-auto p-0.5 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                    title="তারিখ মুছুন"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                )}
-                <Calendar className="w-5 h-5 text-[#006a4e] dark:text-emerald-400" />
-              </div>
+              <Calendar className="absolute right-3 top-3.5 w-5 h-5 text-slate-400 pointer-events-none" />
             </div>
             {dobError && (
               <p className="text-xs font-bengali text-rose-600 dark:text-rose-400 flex items-center gap-1 mt-1">

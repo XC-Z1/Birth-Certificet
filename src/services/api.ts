@@ -27,7 +27,14 @@ export async function fetchBirthRegistrationRecord(
       }
     });
 
-    const data = await response.json();
+    const text = await response.text();
+    let data: any = {};
+    
+    try {
+      data = JSON.parse(text);
+    } catch {
+      throw new Error('সার্ভার থেকে সঠিক ফরম্যাটে তথ্য পাওয়া যায়নি। অনুগ্রহ করে আবার চেষ্টা করুন।');
+    }
 
     if (!response.ok || !data.success) {
       throw new Error(data.error || 'তথ্য খুঁজে পাওয়া যায়নি। অনুগ্রহ করে জন্ম নিবন্ধন নম্বর ও জন্ম তারিখ যাচাই করে আবার চেষ্টা করুন।');
