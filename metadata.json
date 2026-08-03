@@ -1,0 +1,6 @@
+{
+  "name": "Birth Registration Information Verification",
+  "description": "Government style birth registration information verification portal with certificate view, search history, and export features.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

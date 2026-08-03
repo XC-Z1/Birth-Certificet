@@ -1,11 +1,30 @@
-<div align="center">
+# বাংলাদেশ জন্ম নিবন্ধন তথ্য অনুসন্ধান (Bangladesh Birth Registration Information Search)
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+**Developer Name:** X C  
+**Technology Stack:** React 19, TypeScript, Tailwind CSS, Vite, Express Proxy, Framer Motion
 
-  <h1>Built with AI Studio</h2>
+## Overview
+A Government-Style Premium Responsive Web Application for searching and verifying birth registration information in Bangladesh using a 17-digit Birth Registration Number (BRN) and Date of Birth (DOB).
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+## Features
+- **Security & Proxy Backend:** Shields the external API (`https://sbsakib.eu.cc/api/bard`) via a backend serverless/express proxy (`/api/verify`) with rate-limiting and timeout handling.
+- **Dual View Layout:** Modern Government Card Grid View + Authentic Official Certificate View with Government emblem watermark & double borders.
+- **Full Bangla & English Support:** Automatically presents all personal, parental, and registration office attributes in both languages.
+- **Interactive Tools:**
+  - 1-Click Copy for individual fields or full certificate summary
+  - Certificate Print & PDF Export layout (`Ctrl + P`)
+  - Verification QR Code Generator
+  - Local Storage History & Saved Favorites
+  - Keyboard Shortcuts (`Ctrl + K` focus)
+  - Light / Dark / Auto Theme mode switcher
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+## Deployment on Vercel
+1. Import repository on Vercel.
+2. Serverless function in `api/verify.ts` handles API proxy requests seamlessly without CORS errors.
+3. Configure environment variable: `BIRTH_REG_API_URL=https://sbsakib.eu.cc/api/bard`
 
-</div>
+## Development
+```bash
+npm install
+npm run dev
+```
