@@ -175,7 +175,7 @@
   }
 }
 
-/* Dedicated CSS rules for canvas & PDF export */
+/* Dedicated CSS rules for canvas & PDF export (forces crisp official light document mode) */
 .certificate-print-area.exporting-pdf {
   background-color: #ffffff !important;
   color: #0f172a !important;
@@ -186,31 +186,60 @@
   box-shadow: none !important;
 }
 
-.certificate-print-area.exporting-pdf * {
-  color: #0f172a !important;
+/* Light background overrides for dark-mode containers during PDF capture */
+.certificate-print-area.exporting-pdf .dark\:bg-slate-900,
+.certificate-print-area.exporting-pdf .dark\:bg-slate-950,
+.certificate-print-area.exporting-pdf .dark\:bg-slate-800\/90,
+.certificate-print-area.exporting-pdf .dark\:bg-slate-800\/80,
+.certificate-print-area.exporting-pdf .dark\:bg-slate-800\/70,
+.certificate-print-area.exporting-pdf .dark\:bg-slate-800\/60,
+.certificate-print-area.exporting-pdf .dark\:bg-slate-800 {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
 }
 
-.certificate-print-area.exporting-pdf .text-\[\#006a4e\],
-.certificate-print-area.exporting-pdf .text-emerald-950,
-.certificate-print-area.exporting-pdf .dark\:text-emerald-300,
+/* Text color fixes for dark-mode classes during PDF capture */
+.certificate-print-area.exporting-pdf .dark\:text-slate-100,
+.certificate-print-area.exporting-pdf .dark\:text-slate-200,
+.certificate-print-area.exporting-pdf .dark\:text-slate-300 {
+  color: #1e293b !important;
+}
+
+.certificate-print-area.exporting-pdf .dark\:text-slate-400,
+.certificate-print-area.exporting-pdf .dark\:text-slate-500 {
+  color: #475569 !important;
+}
+
 .certificate-print-area.exporting-pdf .dark\:text-emerald-100,
+.certificate-print-area.exporting-pdf .dark\:text-emerald-200,
+.certificate-print-area.exporting-pdf .dark\:text-emerald-300,
 .certificate-print-area.exporting-pdf .dark\:text-emerald-400 {
   color: #006a4e !important;
 }
 
-.certificate-print-area.exporting-pdf .bg-slate-50\/90,
-.certificate-print-area.exporting-pdf .dark\:bg-slate-800\/90 {
+/* Ensure banner white and gold text remain vibrant */
+.certificate-print-area.exporting-pdf .text-white {
+  color: #ffffff !important;
+}
+
+.certificate-print-area.exporting-pdf .text-amber-300,
+.certificate-print-area.exporting-pdf .text-amber-400,
+.certificate-print-area.exporting-pdf .text-\[\#d4af37\] {
+  color: #d4af37 !important;
+}
+
+.certificate-print-area.exporting-pdf .text-\[\#006a4e\],
+.certificate-print-area.exporting-pdf .text-emerald-950 {
+  color: #006a4e !important;
+}
+
+.certificate-print-area.exporting-pdf .bg-slate-50\/90 {
   background-color: #f8fafc !important;
   border-color: #cbd5e1 !important;
 }
 
 .certificate-print-area.exporting-pdf .bg-gradient-to-r {
   background: linear-gradient(to right, #006a4e, #064e3b, #022c22) !important;
-}
-
-.certificate-print-area.exporting-pdf .text-amber-300,
-.certificate-print-area.exporting-pdf .text-amber-400 {
-  color: #d4af37 !important;
 }
 
 .certificate-print-area.exporting-pdf .no-print {

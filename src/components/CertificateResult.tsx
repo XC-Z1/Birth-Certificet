@@ -95,20 +95,60 @@ export const CertificateResult: React.FC<CertificateResultProps> = ({
       const canvas = await html2canvas(element, {
         scale: 3,
         useCORS: true,
+        allowTaint: true,
         logging: false,
         backgroundColor: '#FFFFFF',
-        windowWidth: 1000,
-        ignoreElements: (el) => el.classList.contains('no-print') || el.hasAttribute('data-no-pdf')
+        windowWidth: 1020,
+        ignoreElements: (el) => el.classList.contains('no-print') || el.hasAttribute('data-no-pdf'),
+        onclone: (clonedDoc) => {
+          const tempDiv = document.createElement('div');
+          document.body.appendChild(tempDiv);
+
+          const convertOklchToRgb = (colorStr: string) => {
+            try {
+              tempDiv.style.color = colorStr;
+              const computed = window.getComputedStyle(tempDiv).color;
+              if (computed && (computed.startsWith('rgb') || computed.startsWith('#'))) {
+                return computed;
+              }
+            } catch {
+              // fallback
+            }
+            return 'rgb(0, 106, 78)';
+          };
+
+          // Convert oklch colors in all <style> tags of cloned document
+          const styleTags = clonedDoc.querySelectorAll('style');
+          styleTags.forEach((styleTag) => {
+            if (styleTag.textContent && styleTag.textContent.toLowerCase().includes('oklch')) {
+              styleTag.textContent = styleTag.textContent.replace(/oklch\([\s\S]*?\)/gi, (match) => convertOklchToRgb(match));
+            }
+          });
+
+          // Convert oklch colors in inline style attributes
+          const styledElements = clonedDoc.querySelectorAll('[style*="oklch"], [style*="OKLCH"]');
+          styledElements.forEach((el) => {
+            const styleAttr = el.getAttribute('style');
+            if (styleAttr) {
+              el.setAttribute('style', styleAttr.replace(/oklch\([\s\S]*?\)/gi, (match) => convertOklchToRgb(match)));
+            }
+          });
+
+          if (document.body.contains(tempDiv)) {
+            document.body.removeChild(tempDiv);
+          }
+        }
       });
 
       element.classList.remove('exporting-pdf');
 
-      const imgData = canvas.toDataURL('image/png');
+      const imgData = canvas.toDataURL('image/png', 1.0);
 
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
         format: 'a4',
+        compress: true,
       });
 
       pdf.setProperties({
@@ -139,7 +179,7 @@ export const CertificateResult: React.FC<CertificateResultProps> = ({
       const xOffset = margin + (printableWidth - finalWidth) / 2;
       const yOffset = margin;
 
-      pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight, undefined, 'FAST');
+      pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight, undefined, 'NONE');
       pdf.save(`BD_Birth_Certificate_${data.brn || 'record'}.pdf`);
       
       onCopyField('পিডিএফ ডাউনলোড', 'অফিসিয়াল জন্ম সনদ পিডিএফ ফাইল সফলভাবে ডাউনলোড হয়েছে');
