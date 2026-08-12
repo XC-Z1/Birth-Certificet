@@ -69,6 +69,59 @@ function generateFallbackRecord(cleanBrn: string, cleanDob: string) {
   };
 }
 
+// Normalize various API payload key names to standard BirthRegistrationRecord format
+function normalizeApiResponse(raw: any, cleanBrn: string, cleanDob: string) {
+  if (!raw || typeof raw !== 'object') return null;
+
+  const payload = raw.data || raw.result || raw.record || raw.response || raw;
+
+  const getVal = (...keys: string[]): string | undefined => {
+    for (const k of keys) {
+      if (payload[k] && typeof payload[k] === 'string' && payload[k].trim().length > 0) {
+        return payload[k].trim();
+      }
+    }
+    return undefined;
+  };
+
+  const nameBn = getVal('nameBangla', 'nameBn', 'personNameBn', 'name_bn', 'name_bangla', 'b_name', 'name');
+  const nameEn = getVal('nameEnglish', 'nameEn', 'personNameEn', 'name_en', 'name_english', 'e_name');
+
+  const fatherBn = getVal('fatherName', 'fatherNameBn', 'father_name_bn', 'father_name', 'f_name');
+  const fatherEn = getVal('fatherNameEn', 'father_name_en', 'f_name_en');
+
+  const motherBn = getVal('motherName', 'motherNameBn', 'mother_name_bn', 'mother_name', 'm_name');
+  const motherEn = getVal('motherNameEn', 'mother_name_en', 'm_name_en');
+
+  const genderBn = getVal('gender', 'genderBn', 'gender_bn', 'sex');
+  const genderEn = getVal('genderEn', 'gender_en');
+
+  const registerOffice = getVal('registerOfficeEn', 'registerOffice', 'office_name', 'office', 'registerOfficeLocationEn');
+
+  if (nameBn || nameEn || payload.success === true || payload.status === 'success' || payload.ubrn || payload.brn) {
+    return {
+      status: 200,
+      success: true,
+      ...payload,
+      brn: payload.brn || payload.ubrn || cleanBrn,
+      dateOfBirth: payload.dateOfBirth || payload.dob || cleanDob,
+      dateOfBirthEn: payload.dateOfBirthEn || payload.dobEn || cleanDob,
+      nameBangla: nameBn || payload.nameBangla,
+      nameEnglish: nameEn || payload.nameEnglish,
+      fatherName: fatherBn || payload.fatherName,
+      fatherNameEn: fatherEn || payload.fatherNameEn,
+      motherName: motherBn || payload.motherName,
+      motherNameEn: motherEn || payload.motherNameEn,
+      gender: genderBn || payload.gender,
+      genderEn: genderEn || payload.genderEn,
+      registerOfficeEn: registerOffice || payload.registerOfficeEn,
+      verifiedAt: new Date().toISOString()
+    };
+  }
+
+  return null;
+}
+
 export async function handleVerifyRequest(brn: string, dob: string) {
   // Validate inputs
   const cleanBrn = (brn || '').trim().replace(/\D/g, '');
@@ -92,13 +145,13 @@ export async function handleVerifyRequest(brn: string, dob: string) {
 
   // List of potential upstream proxy API endpoints
   const upstreamEndpoints = [
-    process.env.BIRTH_REG_API_URL,
-    `https://sbsakib.eu.cc/api/bard?brn=${encodeURIComponent(cleanBrn)}&dob=${encodeURIComponent(cleanDob)}`
+    `https://server.teambcs.fun/api.php?key=EZJ7FEDK4USZ29O&ubrn=${encodeURIComponent(cleanBrn)}&dob=${encodeURIComponent(cleanDob)}`,
+    process.env.BIRTH_REG_API_URL
   ].filter(Boolean) as string[];
 
   for (const targetUrl of upstreamEndpoints) {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 6000);
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
 
     try {
       const upstreamRes = await fetch(targetUrl, {
@@ -113,16 +166,10 @@ export async function handleVerifyRequest(brn: string, dob: string) {
       clearTimeout(timeoutId);
 
       if (upstreamRes.ok) {
-        const data = await upstreamRes.json();
-        if (data && (data.success || data.brn || data.nameBangla)) {
-          return {
-            status: 200,
-            success: true,
-            ...data,
-            brn: data.brn || cleanBrn,
-            dateOfBirth: data.dateOfBirth || cleanDob,
-            verifiedAt: new Date().toISOString()
-          };
+        const rawData = await upstreamRes.json();
+        const normalized = normalizeApiResponse(rawData, cleanBrn, cleanDob);
+        if (normalized) {
+          return normalized;
         }
       }
     } catch {
@@ -131,7 +178,7 @@ export async function handleVerifyRequest(brn: string, dob: string) {
     }
   }
 
-  // If upstream API is offline, restricted, or failing on Vercel deployment,
+  // If upstream API is offline, restricted, or failing,
   // return official formatted fallback record matching BRN and DOB
   return generateFallbackRecord(cleanBrn, cleanDob);
 }
