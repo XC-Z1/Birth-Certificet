@@ -1,5 +1,5 @@
 import React from 'react';
-import { Moon, Sun, Menu, HelpCircle, ShieldCheck } from 'lucide-react';
+import { Moon, Sun, Menu, HelpCircle } from 'lucide-react';
 import { GovernmentEmblem } from './GovernmentEmblem';
 
 interface HeaderProps {
@@ -16,9 +16,6 @@ export const Header: React.FC<HeaderProps> = ({
   darkMode,
   setDarkMode,
   onToggleSidebar,
-  searchCounter,
-  onOpenHistory,
-  favoriteCount,
   onOpenAbout
 }) => {
   return (
@@ -45,7 +42,7 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="bg-[#006a4e] min-h-[64px] sm:min-h-[76px] py-2 sm:py-2.5 border-b-2 border-[#d4af37]">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-full flex items-center justify-between gap-2">
           
-          {/* Left: Mobile Menu & Govt Emblem Logo */}
+          {/* Left: Mobile Menu & Govt Emblem Logo with Official Title */}
           <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
             <button
               onClick={onToggleSidebar}
@@ -56,13 +53,22 @@ export const Header: React.FC<HeaderProps> = ({
               <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </button>
 
-            {/* Government Emblem Logo */}
+            {/* Government Emblem Logo & Authentic Portal Title */}
             <div 
-              className="flex items-center space-x-2 group cursor-pointer shrink-0" 
+              className="flex items-center gap-2 sm:gap-3 group cursor-pointer min-w-0" 
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             >
               <div className="bg-white rounded-full flex items-center justify-center p-1 border-2 border-[#d4af37] shadow-sm group-hover:scale-105 transition-transform shrink-0">
                 <GovernmentEmblem size={38} />
+              </div>
+
+              <div className="min-w-0 flex flex-col justify-center">
+                <h1 className="text-white font-bold text-xs sm:text-base md:text-lg leading-tight font-bengali truncate">
+                  জন্ম ও মৃত্যু নিবন্ধন ভেরিফিকেশন পোর্টাল
+                </h1>
+                <p className="text-[#d4af37] text-[9px] sm:text-xs uppercase tracking-wider font-semibold font-english truncate">
+                  Office of the Registrar General, BDRIS
+                </p>
               </div>
             </div>
           </div>
@@ -94,13 +100,6 @@ export const Header: React.FC<HeaderProps> = ({
                 <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-amber-300" />
               )}
             </button>
-
-            {/* Developer Tag Badge */}
-            <div className="hidden md:flex flex-col items-end text-right pl-2 border-l border-emerald-600/50 shrink-0">
-              <span className="text-emerald-100/70 text-[9px] uppercase font-mono">Developed By</span>
-              <span className="text-[#d4af37] font-bold text-xs tracking-wider font-mono">X C</span>
-            </div>
-
           </div>
 
         </div>

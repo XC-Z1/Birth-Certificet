@@ -178,6 +178,43 @@ export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose }) => {
               </p>
             </div>
 
+            {/* Application & Correction FAQ Guidelines */}
+            <div className="space-y-3 pt-2">
+              <h4 className="font-bold text-base text-slate-900 dark:text-slate-100 flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+                <HelpCircle className="w-5 h-5 text-[#006a4e] dark:text-emerald-400" />
+                <span>আবেদন, সংশোধন ও ফি সম্পর্কিত সাধারণ প্রশ্নাবলী (FAQ):</span>
+              </h4>
+
+              <div className="space-y-3 text-xs">
+                <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 space-y-1">
+                  <h5 className="font-bold text-slate-900 dark:text-slate-100 text-sm text-[#006a4e] dark:text-emerald-300">
+                    প্রশ্ন: নতুন জন্ম নিবন্ধনের সরকারি ফি কত?
+                  </h5>
+                  <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+                    শিশুর বয়সের ৪৫ দিনের মধ্যে আবেদন বিনামূল্যে। ৪৫ দিন থেকে ৫ বছর পর্যন্ত ২৫ টাকা এবং ৫ বছরের উর্ধ্বে বয়স হলে ৫০ টাকা সরকারি ফি প্রযোজ্য।
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 space-y-1">
+                  <h5 className="font-bold text-slate-900 dark:text-slate-100 text-sm text-[#006a4e] dark:text-emerald-300">
+                    প্রশ্ন: নাম বা জন্ম তারিখ ভুল থাকলে কীভাবে সংশোধন করব?
+                  </h5>
+                  <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+                    BDRIS অনলাইন পোর্টালে (bdris.gov.bd) "জন্ম নিবন্ধন তথ্য সংশোধন" লিংকে আবেদন করে প্রয়োজনীয় প্রমাণপত্রসহ (যেমন: এনআইডি, শিক্ষা সনদ, বা ডাক্তারী সনদ) সংশ্লিষ্ট নিবন্ধক অফিসে জমা দিন।
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 space-y-1">
+                  <h5 className="font-bold text-slate-900 dark:text-slate-100 text-sm text-[#006a4e] dark:text-emerald-300">
+                    প্রশ্ন: পুরনো এনালগ সনদকে ১৭ ডিজিটের ডিজিটালে রূপান্তর করব কীভাবে?
+                  </h5>
+                  <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+                    আপনার এলাকাভুক্ত নিবন্ধক অফিসে (ইউপি/পৌরসভা/সিটি কর্পোরেশন) হস্তলিখিত বা পুরোনো সনদের মূল কপি নিয়ে গিয়ে অনলাইন এনট্রি সম্পন্ন করে ১৭ ডিজিটের ডিজিটাল ব্রন নম্বর গ্রহণ করুন।
+                  </p>
+                </div>
+              </div>
+            </div>
+
           </div>
 
           {/* Modal Footer */}

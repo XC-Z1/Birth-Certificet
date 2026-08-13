@@ -84,17 +84,11 @@ export const Footer: React.FC = () => {
 
           <div className="space-y-2">
             <h4 className="font-bold text-slate-200 text-sm border-b border-slate-800 pb-1">
-              কারিগরি ও ডেভেলপমেন্ট তথ্য
+              নিরাপত্তা ও গোপনীয়তা নীতি
             </h4>
-            <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
-              <div className="text-amber-400 font-bold flex items-center gap-1">
-                <Code className="w-3.5 h-3.5" />
-                <span>Developer Name: X C</span>
-              </div>
-              <p className="text-[11px] text-slate-400">
-                বাংলাদেশ ডিজিটাল সার্ভিসেস ডিজাইন সিস্টেম ও সিকিউরিটি প্রোটোকল মেনে প্রস্তুতকৃত।
-              </p>
-            </div>
+            <p className="leading-relaxed text-slate-400">
+              জন্ম ও মৃত্যু তথ্য অনলাইন অনুসন্ধান সম্পূর্ণ নিরাপদ। সরকারি নীতি অনুযায়ী এই পোর্টালে অনুসন্ধানের সকল তথ্য এনক্রিপ্ট রাখা হয়।
+            </p>
           </div>
 
         </div>

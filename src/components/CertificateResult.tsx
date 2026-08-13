@@ -27,6 +27,7 @@ export const CertificateResult: React.FC<CertificateResultProps> = ({
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
   const [showIntegrityModal, setShowIntegrityModal] = useState<boolean>(false);
   const [isScanningIntegrity, setIsScanningIntegrity] = useState<boolean>(false);
+  const [langMode, setLangMode] = useState<'bilingual' | 'bn' | 'en'>('bilingual');
   const [scanProgress, setScanProgress] = useState<number>(100);
   const [qrMode, setQrMode] = useState<'url' | 'summary' | 'json'>('summary');
   const [qrCopied, setQrCopied] = useState<boolean>(false);
@@ -347,6 +348,43 @@ Name (En): ${data.nameEnglish || 'N/A'}
 
         <div className="flex items-center flex-wrap gap-2">
           
+          {/* Language View Switcher */}
+          <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-bold font-bengali">
+            <button
+              onClick={() => setLangMode('bilingual')}
+              className={`px-2.5 py-1 rounded-lg transition-all ${
+                langMode === 'bilingual'
+                  ? 'bg-[#006a4e] text-white shadow'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+              }`}
+              title="দ্বিভাষিক সনদ (বাংলা ও ইংরেজি)"
+            >
+              দ্বিভাষিক
+            </button>
+            <button
+              onClick={() => setLangMode('bn')}
+              className={`px-2.5 py-1 rounded-lg transition-all ${
+                langMode === 'bn'
+                  ? 'bg-[#006a4e] text-white shadow'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+              }`}
+              title="শুধুমাত্র বাংলা সনদ"
+            >
+              বাংলা
+            </button>
+            <button
+              onClick={() => setLangMode('en')}
+              className={`px-2.5 py-1 rounded-lg transition-all ${
+                langMode === 'en'
+                  ? 'bg-[#006a4e] text-white shadow'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+              }`}
+              title="English Version Certificate"
+            >
+              English
+            </button>
+          </div>
+
           {/* Favorite Toggle */}
           <button
             onClick={() => onToggleFavorite(data.brn || '', data.dateOfBirth || '')}
@@ -668,16 +706,14 @@ Name (En): ${data.nameEnglish || 'N/A'}
         <div className="mt-8 pt-6 border-t border-slate-300 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 dark:text-slate-400 gap-4">
           <div className="text-center sm:text-left">
             <p className="font-bengali font-semibold text-[#006a4e] dark:text-emerald-400">
-              * এটি একটি অনলাইন সত্যতা যাচাইকরণ কপি।
+              ডিজিটাল অনলাইন জন্ম নিবন্ধন যাচাইকরণ রেকর্ড।
             </p>
-            <p className="text-[10px] font-mono">Verify Reference ID: BARD-VERIFIED-{data.brn}</p>
           </div>
 
           <div className="text-center sm:text-right">
-            <p className="font-mono text-[11px] font-bold text-slate-700 dark:text-slate-300">
-              Developer Name : X C
+            <p className="text-[10px] text-slate-500 font-mono">
+              BRN: {data.brn}
             </p>
-            <p className="text-[10px]">Government Portal Style UI/UX Concept</p>
           </div>
         </div>
 

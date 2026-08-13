@@ -7,6 +7,7 @@ import { HistorySidebar } from './components/HistorySidebar';
 import { SkeletonLoader } from './components/SkeletonLoader';
 import { Footer } from './components/Footer';
 import { AboutModal } from './components/AboutModal';
+import { QrScannerModal } from './components/QrScannerModal';
 import { BirthRecordResponse, SearchHistoryItem } from './types';
 import { playSuccessChime } from './utils/audio';
 import { AlertTriangle, CheckCircle2, X, Shield, Users, Search, FileCheck2 } from 'lucide-react';
@@ -22,6 +23,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [resultData, setResultData] = useState<BirthRecordResponse | null>(null);
   const [isAboutOpen, setIsAboutOpen] = useState<boolean>(false);
+  const [isQrScannerOpen, setIsQrScannerOpen] = useState<boolean>(false);
   
   const [history, setHistory] = useState<SearchHistoryItem[]>(() => {
     try {
@@ -235,6 +237,16 @@ Name (English): ${resultData.nameEnglish || 'N/A'}
         onClose={() => setIsAboutOpen(false)}
       />
 
+      {/* QR Code Camera / Upload Scanner Modal */}
+      <QrScannerModal
+        isOpen={isQrScannerOpen}
+        onClose={() => setIsQrScannerOpen(false)}
+        onScanSuccess={(scannedBrn, scannedDob) => {
+          setIsQrScannerOpen(false);
+          handleSearch(scannedBrn, scannedDob);
+        }}
+      />
+
       {/* History & Favorites Drawer Sidebar */}
       <HistorySidebar
         isOpen={isSidebarOpen}
@@ -286,6 +298,10 @@ Name (English): ${resultData.nameEnglish || 'N/A'}
             onSearch={handleSearch}
             isLoading={isLoading}
             onReset={handleReset}
+            onOpenQrScanner={() => setIsQrScannerOpen(true)}
+            onOpenGuide={() => setIsAboutOpen(true)}
+            onOpenHistory={() => setIsSidebarOpen(true)}
+            historyCount={history.length}
           />
         </div>
 
