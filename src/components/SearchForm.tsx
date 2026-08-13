@@ -40,10 +40,11 @@ export const SearchForm: React.FC<SearchFormProps> = ({
   const [dob, setDob] = useState('');
   const [captchaInput, setCaptchaInput] = useState('');
   
-  // Captcha state: 'code' (e.g. 5-character "7K9A2"), 'math' ("18 + 7"), 'bangla' ("৫৮৩৯২")
-  const [captchaType, setCaptchaType] = useState<'code' | 'math' | 'bangla'>('code');
+  // Captcha state: 'code' (e.g. "7K9A2"), 'math' ("18 + 7"), 'bangla' ("৫৮৩৯২"), 'easy' ("1-click auto-verify / আমি মানুষ")
+  const [captchaType, setCaptchaType] = useState<'code' | 'math' | 'bangla' | 'easy'>('code');
   const [captchaCode, setCaptchaCode] = useState<string>(''); // Expected answer
   const [captchaDisplayText, setCaptchaDisplayText] = useState<string>(''); // Text rendered on canvas
+  const [isHumanVerified, setIsHumanVerified] = useState<boolean>(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -65,7 +66,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
     }, 4000);
   };
 
-  // Draw realistic distorted security CAPTCHA on HTML Canvas
+  // Draw realistic distorted security CAPTCHA on HTML Canvas with official security patterns
   const drawCaptcha = (text: string) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -75,15 +76,25 @@ export const SearchForm: React.FC<SearchFormProps> = ({
     const width = canvas.width;
     const height = canvas.height;
 
-    // 1. Fill Background gradient
+    // 1. Fill Background gradient with security tint
     const bgGradient = ctx.createLinearGradient(0, 0, width, height);
-    bgGradient.addColorStop(0, '#f8fafc');
+    bgGradient.addColorStop(0, '#f0fdf4');
+    bgGradient.addColorStop(0.5, '#f8fafc');
     bgGradient.addColorStop(1, '#e2e8f0');
     ctx.fillStyle = bgGradient;
     ctx.fillRect(0, 0, width, height);
 
-    // 2. Draw subtle background pattern / grid lines
-    ctx.strokeStyle = '#cbd5e1';
+    // 2. Security micro-text watermark pattern across canvas
+    ctx.fillStyle = 'rgba(0, 106, 78, 0.06)';
+    ctx.font = '700 8px monospace';
+    for (let x = 4; x < width; x += 40) {
+      for (let y = 10; y < height; y += 14) {
+        ctx.fillText('BDRIS SECURE', x, y);
+      }
+    }
+
+    // 3. Draw security grid lines
+    ctx.strokeStyle = 'rgba(203, 213, 225, 0.8)';
     ctx.lineWidth = 1;
     for (let i = 0; i < width; i += 12) {
       ctx.beginPath();
@@ -98,19 +109,19 @@ export const SearchForm: React.FC<SearchFormProps> = ({
       ctx.stroke();
     }
 
-    // 3. Draw random noise dots
-    for (let i = 0; i < 50; i++) {
-      ctx.fillStyle = `rgba(${Math.floor(Math.random() * 200)}, ${Math.floor(Math.random() * 200)}, ${Math.floor(Math.random() * 200)}, 0.45)`;
+    // 4. Draw random security noise dots
+    for (let i = 0; i < 65; i++) {
+      ctx.fillStyle = `rgba(${Math.floor(Math.random() * 180)}, ${Math.floor(Math.random() * 180)}, ${Math.floor(Math.random() * 180)}, 0.4)`;
       ctx.beginPath();
       ctx.arc(Math.random() * width, Math.random() * height, Math.random() * 2.2, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    // 4. Draw squiggly interference lines
-    const colors = ['#006a4e', '#0369a1', '#be123c', '#7c2d12', '#431407', '#15803d'];
-    for (let i = 0; i < 4; i++) {
-      ctx.strokeStyle = colors[Math.floor(Math.random() * colors.length)];
-      ctx.lineWidth = Math.random() * 2 + 1;
+    // 5. Draw multi-colored wavy interference curves
+    const colors = ['#006a4e', '#0369a1', '#be123c', '#7c2d12', '#1e293b', '#15803d'];
+    for (let i = 0; i < 5; i++) {
+      ctx.strokeStyle = colors[i % colors.length];
+      ctx.lineWidth = Math.random() * 1.8 + 1;
       ctx.beginPath();
       ctx.moveTo(Math.random() * 20, Math.random() * height);
       ctx.bezierCurveTo(
@@ -121,23 +132,23 @@ export const SearchForm: React.FC<SearchFormProps> = ({
       ctx.stroke();
     }
 
-    // 5. Render characters with random rotation, scale, and color
+    // 6. Render characters with random rotation, scale, shadow & color
     const chars = text.split('');
     const charWidth = width / (chars.length + 1);
 
     chars.forEach((char, index) => {
       ctx.save();
-      const fontSize = Math.floor(Math.random() * 4) + 23; // 23px to 27px
+      const fontSize = Math.floor(Math.random() * 4) + 24; // 24px to 28px
       ctx.font = `bold ${fontSize}px "Kalpurush", "Tiro Bangla", "Courier New", monospace, sans-serif`;
       ctx.fillStyle = colors[index % colors.length];
 
       const x = (index + 0.8) * charWidth;
       const y = height / 2 + Math.floor(Math.random() * 8) - 4;
-      const angle = (Math.random() - 0.5) * 0.4; // -12 to +12 degrees
+      const angle = (Math.random() - 0.5) * 0.35; // -10 to +10 degrees
 
       ctx.translate(x, y);
       ctx.rotate(angle);
-      ctx.shadowColor = 'rgba(0,0,0,0.2)';
+      ctx.shadowColor = 'rgba(0,0,0,0.25)';
       ctx.shadowOffsetX = 2;
       ctx.shadowOffsetY = 2;
       ctx.fillText(char, 0, 8);
@@ -148,6 +159,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
   const generateNewCaptcha = () => {
     setCaptchaInput('');
     setCaptchaError('');
+    setIsHumanVerified(false);
 
     if (captchaType === 'code') {
       // 5-character alphanumeric uppercase code
@@ -172,7 +184,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
         setCaptchaCode((n1 + n2).toString());
         setCaptchaDisplayText(`${n1} + ${n2} = ?`);
       }
-    } else {
+    } else if (captchaType === 'bangla') {
       // Bangla 5-digit security code e.g. "৫৮৩৯২"
       let engDigits = '';
       for (let i = 0; i < 5; i++) {
@@ -180,6 +192,13 @@ export const SearchForm: React.FC<SearchFormProps> = ({
       }
       setCaptchaCode(engDigits); // Store 5-digit number
       setCaptchaDisplayText(toBanglaDigit(engDigits)); // Display in Bangla digits
+    } else {
+      // 'easy': 1-Click Smart Verification ("আমি মানুষ / Auto-Verify")
+      const autoCode = 'VERIFIED';
+      setCaptchaCode(autoCode);
+      setCaptchaDisplayText('VERIFIED');
+      setCaptchaInput(autoCode);
+      setIsHumanVerified(true);
     }
   };
 
@@ -536,7 +555,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
               </div>
 
               {/* Mode Toggle Switch: Image Code vs Bangla Digits vs Math Challenge */}
-              <div className="flex items-center gap-1 bg-slate-200 dark:bg-slate-700 p-1 rounded-xl text-xs font-bold self-start sm:self-auto overflow-x-auto">
+              <div className="flex items-center gap-1 bg-slate-200 dark:bg-slate-700 p-1 rounded-xl text-xs font-bold self-start sm:self-auto overflow-x-auto max-w-full">
                 <button
                   type="button"
                   onClick={() => setCaptchaType('code')}

@@ -363,3 +363,26 @@
 .animate-fade-in-up {
   animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Official Physical Security Paper Texture Overlay */
+.security-paper-overlay {
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(0, 106, 78, 0.03) 0%, transparent 60%),
+    repeating-linear-gradient(45deg, rgba(0, 106, 78, 0.015) 0px, rgba(0, 106, 78, 0.015) 1px, transparent 1px, transparent 12px),
+    repeating-linear-gradient(-45deg, rgba(180, 130, 0, 0.015) 0px, rgba(180, 130, 0, 0.015) 1px, transparent 1px, transparent 12px),
+    radial-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 0);
+  background-size: 100% 100%, 24px 24px, 24px 24px, 12px 12px;
+}
+
+/* Metallic Security Thread Stripe */
+.security-thread-stripe {
+  background: linear-gradient(
+    180deg,
+    rgba(217, 119, 6, 0.25) 0%,
+    rgba(245, 158, 11, 0.6) 25%,
+    rgba(16, 185, 129, 0.5) 50%,
+    rgba(245, 158, 11, 0.6) 75%,
+    rgba(217, 119, 6, 0.25) 100%
+  );
+}
+

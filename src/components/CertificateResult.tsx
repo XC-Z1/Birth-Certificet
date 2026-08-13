@@ -498,15 +498,25 @@ Name (En): ${data.nameEnglish || 'N/A'}
         ref={certificateRef}
         className={`certificate-print-area gov-certificate-border bg-white dark:bg-slate-900/95 rounded-2xl p-6 sm:p-10 shadow-2xl relative overflow-hidden transition-all border-2 ${
           isOfficialView
-            ? 'border-emerald-800/60 dark:border-emerald-500/50 ring-4 ring-amber-400/20'
+            ? 'border-emerald-800/60 dark:border-emerald-500/50 ring-4 ring-amber-400/20 security-paper-overlay'
             : 'border-emerald-800/20 dark:border-emerald-500/30'
         }`}
       >
-        {/* Large Background Watermark Overlay (Visible in Official View or Print) */}
+        {/* Physical Security Thread & Background Watermark (Official View) */}
         {isOfficialView && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 opacity-[0.06] dark:opacity-[0.10] select-none">
-            <GovernmentEmblem size={320} />
-          </div>
+          <>
+            {/* Vertical Holographic Security Thread Overlay */}
+            <div className="absolute left-8 sm:left-12 top-0 bottom-0 w-1.5 security-thread-stripe opacity-75 z-0 pointer-events-none hidden sm:block border-x border-amber-300/40">
+              <div className="h-full w-full flex flex-col justify-around items-center py-8 text-[7px] font-mono text-amber-950 font-extrabold rotate-180 write-vertical select-none opacity-60">
+                <span>GOVT OF BANGLADESH</span>
+              </div>
+            </div>
+
+            {/* Large Background Watermark Overlay */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 opacity-[0.06] dark:opacity-[0.10] select-none">
+              <GovernmentEmblem size={320} />
+            </div>
+          </>
         )}
         
         {/* Certificate Header Banner */}
