@@ -35,6 +35,7 @@ export const CertificateResult: React.FC<CertificateResultProps> = ({
   const [integrityCopied, setIntegrityCopied] = useState<boolean>(false);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState<boolean>(false);
   const [isDownloadingImage, setIsDownloadingImage] = useState<boolean>(false);
+  const [isOfficialView, setIsOfficialView] = useState<boolean>(true);
 
   // Compute Data Integrity Rules
   const brnClean = (data.brn || '').replace(/\D/g, '');
@@ -335,7 +336,7 @@ Name (En): ${data.nameEnglish || 'N/A'}
   };
 
   return (
-    <div className="w-full space-y-6 transition-all duration-300">
+    <div className="w-full space-y-6 transition-all duration-300 animate-fade-in-up">
       
       {/* Top Action Toolbar */}
       <div className="no-print glass-panel rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 border border-emerald-700/20 shadow-md">
@@ -384,6 +385,23 @@ Name (En): ${data.nameEnglish || 'N/A'}
               English
             </button>
           </div>
+
+          {/* Official View Toggle Switch */}
+          <button
+            onClick={() => setIsOfficialView(!isOfficialView)}
+            className={`px-3 py-1.5 rounded-xl font-bengali text-xs font-bold flex items-center gap-2 transition-all border shadow-sm ${
+              isOfficialView
+                ? 'bg-gradient-to-r from-emerald-800 to-[#006a4e] text-amber-300 border-amber-400/60 ring-2 ring-emerald-600/30'
+                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'
+            }`}
+            title="অফিসিয়াল ওয়াটারমার্ক ও প্রিন্ট সিল সম্বলিত ভিউ চালু বা বন্ধ করুন (Official Print View)"
+          >
+            <div className={`w-7 h-4 rounded-full p-0.5 transition-colors relative flex items-center ${isOfficialView ? 'bg-amber-400' : 'bg-slate-300 dark:bg-slate-600'}`}>
+              <div className={`w-3 h-3 rounded-full transition-transform ${isOfficialView ? 'translate-x-3 bg-emerald-950' : 'translate-x-0 bg-white'}`} />
+            </div>
+            <FileCheck2 className={`w-4 h-4 ${isOfficialView ? 'text-amber-300' : 'text-slate-400'}`} />
+            <span>অফিসিয়াল ভিউ {isOfficialView ? '(অন)' : '(অফ)'}</span>
+          </button>
 
           {/* Favorite Toggle */}
           <button
@@ -478,8 +496,18 @@ Name (En): ${data.nameEnglish || 'N/A'}
       {/* Main Government Certificate Card View */}
       <div
         ref={certificateRef}
-        className="certificate-print-area gov-certificate-border bg-white dark:bg-slate-900/95 rounded-2xl p-6 sm:p-10 shadow-2xl relative overflow-hidden bg-watermark transition-all border-2 border-emerald-800/20 dark:border-emerald-500/30"
+        className={`certificate-print-area gov-certificate-border bg-white dark:bg-slate-900/95 rounded-2xl p-6 sm:p-10 shadow-2xl relative overflow-hidden transition-all border-2 ${
+          isOfficialView
+            ? 'border-emerald-800/60 dark:border-emerald-500/50 ring-4 ring-amber-400/20'
+            : 'border-emerald-800/20 dark:border-emerald-500/30'
+        }`}
       >
+        {/* Large Background Watermark Overlay (Visible in Official View or Print) */}
+        {isOfficialView && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 opacity-[0.06] dark:opacity-[0.10] select-none">
+            <GovernmentEmblem size={320} />
+          </div>
+        )}
         
         {/* Certificate Header Banner */}
         <div className="text-center space-y-3 pb-6 border-b-2 border-emerald-800/20 dark:border-emerald-500/20 relative">
@@ -702,17 +730,63 @@ Name (En): ${data.nameEnglish || 'N/A'}
           </div>
         </div>
 
-        {/* Certificate Bottom Official Footer */}
+        {/* Official Seal & Registrar Signature Section Overlay */}
+        {isOfficialView && (
+          <div className="mt-8 pt-6 border-t-2 border-dashed border-emerald-800/30 flex flex-col sm:flex-row items-center justify-between gap-6 relative z-10">
+            {/* Left Round Government Seal */}
+            <div className="flex items-center gap-3.5">
+              <div className="relative w-20 h-20 rounded-full border-2 border-dashed border-emerald-800/80 p-1 flex items-center justify-center text-center bg-emerald-50/80 dark:bg-emerald-950/40 shadow-inner shrink-0">
+                <div className="w-full h-full rounded-full border border-emerald-800/60 flex flex-col items-center justify-center p-1 text-[8px] font-bold text-emerald-900 dark:text-emerald-300 font-bengali leading-tight">
+                  <GovernmentEmblem size={22} />
+                  <span className="mt-0.5">জন্ম ও মৃত্যু নিবন্ধন</span>
+                  <span className="text-[7px] text-amber-800 dark:text-amber-400 font-mono font-bold">OFFICIAL SEAL</span>
+                </div>
+              </div>
+              <div className="text-left font-bengali">
+                <p className="text-xs font-bold text-[#006a4e] dark:text-emerald-400">
+                  রেজিস্ট্রার জেনারেলের কার্যালয়
+                </p>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                  ডিজিটাল সিল ও সরকারি অথেনটিকেশন রেকর্ড
+                </p>
+                <p className="text-[9px] text-emerald-700 dark:text-emerald-300 font-mono mt-0.5 font-semibold">
+                  SEAL VERIFIED #BD-GOV-2026
+                </p>
+              </div>
+            </div>
+
+            {/* Right Registrar Signature Line */}
+            <div className="text-center font-bengali space-y-1">
+              <div className="w-40 h-9 border-b-2 border-emerald-950/70 dark:border-emerald-400/70 flex items-end justify-center pb-0.5">
+                <span className="font-mono text-xs italic font-bold text-emerald-900 dark:text-emerald-300 opacity-85 tracking-widest select-none">
+                  Registrar_Gen_Signed
+                </span>
+              </div>
+              <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                প্রস্তুতকারীর স্বাক্ষর ও কার্যালয়ের সিল
+              </p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-english">
+                Prepared By Signature & Registrar Seal
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Certificate Bottom Official Footer & Print Stamp */}
         <div className="mt-8 pt-6 border-t border-slate-300 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 dark:text-slate-400 gap-4">
-          <div className="text-center sm:text-left">
-            <p className="font-bengali font-semibold text-[#006a4e] dark:text-emerald-400">
-              ডিজিটাল অনলাইন জন্ম নিবন্ধন যাচাইকরণ রেকর্ড।
+          <div className="text-center sm:text-left space-y-0.5">
+            <p className="font-bengali font-bold text-[#006a4e] dark:text-emerald-400">
+              গণপ্রজাতন্ত্রী বাংলাদেশ সরকার - ডিজিটাল অনলাইন জন্ম নিবন্ধন যাচাইকরণ রেকর্ড।
+            </p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-bengali">
+              অফিসিয়াল রেকর্ড যাচাইকরণ পোর্টালে সংরক্ষিত ডাটাবেজ থেকে প্রস্তুতকৃত।
             </p>
           </div>
 
-          <div className="text-center sm:text-right">
-            <p className="text-[10px] text-slate-500 font-mono">
-              BRN: {data.brn}
+          <div className="text-center sm:text-right font-mono text-[11px]">
+            <p className="font-bold text-slate-800 dark:text-slate-200">BRN: {data.brn}</p>
+            <p className="text-[10px] text-slate-500 font-bengali mt-0.5">
+              প্রিন্ট তারিখ ও সময় (Generated): {new Date().toLocaleString('bn-BD', { dateStyle: 'full', timeStyle: 'medium' })}
             </p>
           </div>
         </div>
