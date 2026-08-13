@@ -431,29 +431,29 @@ Name (En): ${data.nameEnglish || 'N/A'}
             সব কপি
           </button>
 
-          {/* Direct PDF Download Button */}
+          {/* High-Quality PDF Download Button (jsPDF + html2canvas) */}
           <button
             onClick={handleDownloadPdf}
             disabled={isDownloadingPdf}
-            className="px-4 py-2 rounded-xl bg-[#006a4e] hover:bg-emerald-800 text-white font-bengali text-xs font-bold flex items-center gap-1.5 shadow-md transition-colors border-b-2 border-[#d4af37] disabled:opacity-70"
-            title="পিডিএফ ফাইল সরাসরি ডাউনলোড করুন"
+            className="px-4 py-2 rounded-xl bg-[#006a4e] hover:bg-emerald-800 text-white font-bengali text-xs font-bold flex items-center gap-1.5 shadow-md transition-all border-b-2 border-[#d4af37] disabled:opacity-70 active:scale-95"
+            title="jsPDF ও html2canvas দিয়ে উচ্চ-মানের পিডিএফ ডাউনলোড করুন"
           >
             {isDownloadingPdf ? (
               <Loader2 className="w-4 h-4 text-amber-300 animate-spin" />
             ) : (
-              <FileText className="w-4 h-4 text-amber-300" />
+              <Download className="w-4 h-4 text-amber-300" />
             )}
-            {isDownloadingPdf ? 'পিডিএফ তৈরি হচ্ছে...' : 'PDF ডাউনলোড'}
+            {isDownloadingPdf ? 'পিডিএফ তৈরি হচ্ছে...' : 'PDF ডাউনলোড (jsPDF)'}
           </button>
 
-          {/* Browser Print / PDF Save */}
+          {/* Download Certificate A4 Print Button */}
           <button
             onClick={handlePrint}
-            className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 font-bengali text-xs font-semibold flex items-center gap-1.5 border border-slate-300 dark:border-slate-700 transition-colors"
-            title="ব্রাউজারের মাধ্যমে প্রিন্ট বা পিডিএফ সেভ করুন"
+            className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bengali text-xs font-bold flex items-center gap-1.5 shadow-md transition-all border-b-2 border-amber-700 active:scale-95"
+            title="অফিসিয়াল A4 সাইজে ব্রাউজারের মাধ্যমে ডাইরেক্ট প্রিন্ট বা সেভ করুন (Download Certificate A4)"
           >
-            <Printer className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            প্রিন্ট করুন
+            <Printer className="w-4 h-4 text-slate-950" />
+            <span>Download Certificate (A4)</span>
           </button>
 
           {/* Social Media & Mobile Native Web Share */}

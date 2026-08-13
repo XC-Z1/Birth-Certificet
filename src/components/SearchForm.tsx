@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, RotateCcw, Calendar, FileText, AlertCircle, ShieldCheck, RefreshCw, Lock, XCircle, X, QrCode, History, HelpCircle, Sparkles, Image, Binary } from 'lucide-react';
+import { Search, RotateCcw, Calendar, FileText, AlertCircle, ShieldCheck, RefreshCw, Lock, XCircle, X, QrCode, History, HelpCircle, Sparkles, Image, Binary, Volume2, Languages, CheckCircle2 } from 'lucide-react';
 
 interface SearchFormProps {
   onSearch: (brn: string, dob: string) => void;
@@ -10,6 +10,22 @@ interface SearchFormProps {
   onOpenHistory?: () => void;
   historyCount?: number;
 }
+
+// Convert English numbers to Bengali digits
+const toBanglaDigit = (str: string): string => {
+  const banglaDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+  return str.replace(/\d/g, (digit) => banglaDigits[parseInt(digit, 10)]);
+};
+
+// Convert Bengali digits to English numbers
+const normalizeBanglaToEnglish = (str: string): string => {
+  const banglaDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+  let res = str;
+  banglaDigits.forEach((bDigit, engDigit) => {
+    res = res.replaceAll(bDigit, engDigit.toString());
+  });
+  return res;
+};
 
 export const SearchForm: React.FC<SearchFormProps> = ({
   onSearch,
@@ -24,10 +40,11 @@ export const SearchForm: React.FC<SearchFormProps> = ({
   const [dob, setDob] = useState('');
   const [captchaInput, setCaptchaInput] = useState('');
   
-  // Captcha state: 'code' (e.g. 5-digit image "7K9A2") or 'math' (e.g. "18 + 7")
-  const [captchaType, setCaptchaType] = useState<'code' | 'math'>('code');
-  const [captchaCode, setCaptchaCode] = useState<string>(''); // Answer
+  // Captcha state: 'code' (e.g. 5-character "7K9A2"), 'math' ("18 + 7"), 'bangla' ("৫৮৩৯২")
+  const [captchaType, setCaptchaType] = useState<'code' | 'math' | 'bangla'>('code');
+  const [captchaCode, setCaptchaCode] = useState<string>(''); // Expected answer
   const [captchaDisplayText, setCaptchaDisplayText] = useState<string>(''); // Text rendered on canvas
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const [brnError, setBrnError] = useState('');
@@ -58,12 +75,15 @@ export const SearchForm: React.FC<SearchFormProps> = ({
     const width = canvas.width;
     const height = canvas.height;
 
-    // 1. Fill Background
-    ctx.fillStyle = '#f8fafc';
+    // 1. Fill Background gradient
+    const bgGradient = ctx.createLinearGradient(0, 0, width, height);
+    bgGradient.addColorStop(0, '#f8fafc');
+    bgGradient.addColorStop(1, '#e2e8f0');
+    ctx.fillStyle = bgGradient;
     ctx.fillRect(0, 0, width, height);
 
     // 2. Draw subtle background pattern / grid lines
-    ctx.strokeStyle = '#e2e8f0';
+    ctx.strokeStyle = '#cbd5e1';
     ctx.lineWidth = 1;
     for (let i = 0; i < width; i += 12) {
       ctx.beginPath();
@@ -79,10 +99,10 @@ export const SearchForm: React.FC<SearchFormProps> = ({
     }
 
     // 3. Draw random noise dots
-    for (let i = 0; i < 45; i++) {
-      ctx.fillStyle = `rgba(${Math.floor(Math.random() * 200)}, ${Math.floor(Math.random() * 200)}, ${Math.floor(Math.random() * 200)}, 0.4)`;
+    for (let i = 0; i < 50; i++) {
+      ctx.fillStyle = `rgba(${Math.floor(Math.random() * 200)}, ${Math.floor(Math.random() * 200)}, ${Math.floor(Math.random() * 200)}, 0.45)`;
       ctx.beginPath();
-      ctx.arc(Math.random() * width, Math.random() * height, Math.random() * 2, 0, Math.PI * 2);
+      ctx.arc(Math.random() * width, Math.random() * height, Math.random() * 2.2, 0, Math.PI * 2);
       ctx.fill();
     }
 
@@ -90,7 +110,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
     const colors = ['#006a4e', '#0369a1', '#be123c', '#7c2d12', '#431407', '#15803d'];
     for (let i = 0; i < 4; i++) {
       ctx.strokeStyle = colors[Math.floor(Math.random() * colors.length)];
-      ctx.lineWidth = Math.random() * 1.8 + 1;
+      ctx.lineWidth = Math.random() * 2 + 1;
       ctx.beginPath();
       ctx.moveTo(Math.random() * 20, Math.random() * height);
       ctx.bezierCurveTo(
@@ -107,17 +127,17 @@ export const SearchForm: React.FC<SearchFormProps> = ({
 
     chars.forEach((char, index) => {
       ctx.save();
-      const fontSize = Math.floor(Math.random() * 5) + 22; // 22px to 27px
-      ctx.font = `bold ${fontSize}px "Courier New", monospace, sans-serif`;
+      const fontSize = Math.floor(Math.random() * 4) + 23; // 23px to 27px
+      ctx.font = `bold ${fontSize}px "Kalpurush", "Tiro Bangla", "Courier New", monospace, sans-serif`;
       ctx.fillStyle = colors[index % colors.length];
 
       const x = (index + 0.8) * charWidth;
       const y = height / 2 + Math.floor(Math.random() * 8) - 4;
-      const angle = (Math.random() - 0.5) * 0.45; // -13 to +13 degrees
+      const angle = (Math.random() - 0.5) * 0.4; // -12 to +12 degrees
 
       ctx.translate(x, y);
       ctx.rotate(angle);
-      ctx.shadowColor = 'rgba(0,0,0,0.15)';
+      ctx.shadowColor = 'rgba(0,0,0,0.2)';
       ctx.shadowOffsetX = 2;
       ctx.shadowOffsetY = 2;
       ctx.fillText(char, 0, 8);
@@ -138,14 +158,62 @@ export const SearchForm: React.FC<SearchFormProps> = ({
       }
       setCaptchaCode(result);
       setCaptchaDisplayText(result);
+    } else if (captchaType === 'math') {
+      // Math problem e.g. 18 + 7 or 25 - 9
+      const isSub = Math.random() > 0.5;
+      if (isSub) {
+        const n1 = Math.floor(Math.random() * 30) + 10;
+        const n2 = Math.floor(Math.random() * 9) + 1;
+        setCaptchaCode((n1 - n2).toString());
+        setCaptchaDisplayText(`${n1} - ${n2} = ?`);
+      } else {
+        const n1 = Math.floor(Math.random() * 25) + 5;
+        const n2 = Math.floor(Math.random() * 15) + 1;
+        setCaptchaCode((n1 + n2).toString());
+        setCaptchaDisplayText(`${n1} + ${n2} = ?`);
+      }
     } else {
-      // Math problem e.g. 18 + 7
-      const n1 = Math.floor(Math.random() * 25) + 5;
-      const n2 = Math.floor(Math.random() * 15) + 1;
-      const sum = (n1 + n2).toString();
-      setCaptchaCode(sum);
-      setCaptchaDisplayText(`${n1} + ${n2} = ?`);
+      // Bangla 5-digit security code e.g. "৫৮৩৯২"
+      let engDigits = '';
+      for (let i = 0; i < 5; i++) {
+        engDigits += Math.floor(Math.random() * 10).toString();
+      }
+      setCaptchaCode(engDigits); // Store 5-digit number
+      setCaptchaDisplayText(toBanglaDigit(engDigits)); // Display in Bangla digits
     }
+  };
+
+  // Voice Reader for CAPTCHA
+  const speakCaptcha = () => {
+    if (!('speechSynthesis' in window)) {
+      showToastMsg('আপনার ব্রাউজারে অডিও স্পিচ সমর্থন করে না।', 'error');
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    setIsSpeaking(true);
+
+    let textToSpeak = '';
+    let lang = 'en-US';
+
+    if (captchaType === 'bangla') {
+      lang = 'bn-BD';
+      textToSpeak = `ক্যাপচা কোড হলো ${captchaDisplayText.split('').join(' , ')}`;
+    } else if (captchaType === 'math') {
+      lang = 'bn-BD';
+      textToSpeak = `গাণিতিক প্রশ্ন: ${captchaDisplayText.replace('?', 'কত')}`;
+    } else {
+      lang = 'en-US';
+      textToSpeak = `Security code is: ${captchaCode.split('').join(' . ')}`;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+    utterance.lang = lang;
+    utterance.rate = 0.85; // Slightly slower for clarity
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+
+    window.speechSynthesis.speak(utterance);
   };
 
   useEffect(() => {
@@ -166,6 +234,15 @@ export const SearchForm: React.FC<SearchFormProps> = ({
     }
     prevLoadingRef.current = isLoading;
   }, [isLoading]);
+
+  // Fill sample test data
+  const handleFillSample = (sampleBrn: string, sampleDob: string) => {
+    setBrn(sampleBrn);
+    setDob(sampleDob);
+    setBrnError('');
+    setDobError('');
+    showToastMsg('✓ নমুনা পরীক্ষা তথ্য ফর্ম বক্সে পূরণ করা হয়েছে!', 'success');
+  };
 
   const validateForm = (): boolean => {
     let isValid = true;
@@ -190,13 +267,17 @@ export const SearchForm: React.FC<SearchFormProps> = ({
       isValid = false;
     }
 
-    const userInput = captchaInput.trim();
-    if (!userInput) {
+    // Normalize userInput (supports both English and Bangla numbers)
+    const rawInput = captchaInput.trim();
+    const userInputNormalized = normalizeBanglaToEnglish(rawInput).toUpperCase();
+    const expectedNormalized = captchaCode.toUpperCase();
+
+    if (!rawInput) {
       const errMsg = 'ক্যাপচা উত্তর প্রদান করা আবশ্যক।';
       setCaptchaError(errMsg);
       showToastMsg('⚠️ ' + errMsg, 'error');
       isValid = false;
-    } else if (userInput.toUpperCase() !== captchaCode.toUpperCase()) {
+    } else if (userInputNormalized !== expectedNormalized) {
       const errMsg = 'ক্যাপচা কোড সঠিক হয়নি! ছবির অক্ষরের সাথে মিলিয়ে পুনরায় টাইপ করুন।';
       setCaptchaError(errMsg);
       showToastMsg('❌ ' + errMsg, 'error');
@@ -450,34 +531,47 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                   <span>নিরাপত্তা ক্যাপচা কোড (Security Captcha) <span className="text-rose-500">*</span></span>
                 </label>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                  ছবির নিরাপত্তা কোডটি নিম্নের বক্সে হুবহু টাইপ করুন।
+                  ছবির নিরাপত্তা কোডটি নিম্নের বক্সে হুবহু টাইপ করুন (বাংলা বা ইংরেজি উভয় সংখ্যা সমর্থিত)।
                 </p>
               </div>
 
-              {/* Mode Toggle Switch: Image Code vs Math Challenge */}
-              <div className="flex items-center gap-1 bg-slate-200 dark:bg-slate-700 p-1 rounded-xl text-xs font-bold self-start sm:self-auto">
+              {/* Mode Toggle Switch: Image Code vs Bangla Digits vs Math Challenge */}
+              <div className="flex items-center gap-1 bg-slate-200 dark:bg-slate-700 p-1 rounded-xl text-xs font-bold self-start sm:self-auto overflow-x-auto">
                 <button
                   type="button"
                   onClick={() => setCaptchaType('code')}
-                  className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 ${
+                  className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 whitespace-nowrap ${
                     captchaType === 'code'
                       ? 'bg-[#006a4e] text-white shadow'
                       : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'
                   }`}
-                  title="ছবি কোড নিরাপত্তা যাচাই"
+                  title="ইংরেজি ছবি কোড"
                 >
                   <Image className="w-3.5 h-3.5" />
-                  <span>ছবি কোড</span>
+                  <span>ইংরেজি কোড</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCaptchaType('bangla')}
+                  className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 whitespace-nowrap ${
+                    captchaType === 'bangla'
+                      ? 'bg-[#006a4e] text-white shadow'
+                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'
+                  }`}
+                  title="বাংলা সংখ্যা ক্যাপচা"
+                >
+                  <Languages className="w-3.5 h-3.5" />
+                  <span>বাংলা সংখ্যা</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setCaptchaType('math')}
-                  className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 ${
+                  className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 whitespace-nowrap ${
                     captchaType === 'math'
                       ? 'bg-[#006a4e] text-white shadow'
                       : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'
                   }`}
-                  title="গাণিতিক হিসাব নিরাপত্তা যাচাই"
+                  title="গাণিতিক হিসাব"
                 >
                   <Binary className="w-3.5 h-3.5" />
                   <span>গাণিতিক</span>
@@ -488,7 +582,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
             {/* Captcha Image Canvas + Controls */}
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
               
-              {/* Canvas Image Container */}
+              {/* Canvas Image Container + Refresh + Voice Reader */}
               <div className="flex items-center gap-2">
                 <div className="relative rounded-xl overflow-hidden border-2 border-slate-300 dark:border-slate-600 shadow-sm bg-white shrink-0">
                   <canvas
@@ -501,26 +595,47 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                   ></canvas>
                 </div>
 
+                {/* Refresh Captcha Button */}
                 <button
                   type="button"
                   onClick={generateNewCaptcha}
                   className="p-3 rounded-xl bg-slate-200 dark:bg-slate-700 hover:bg-emerald-100 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 transition-all active:scale-95 shrink-0"
-                  title="নতুন ক্যাপচা ছবি তৈরি করুন (Refresh Captcha)"
+                  title="নতুন ক্যাপচা কোড তৈরি করুন (Refresh Captcha)"
                 >
                   <RefreshCw className="w-5 h-5 text-[#006a4e] dark:text-emerald-400" />
                 </button>
+
+                {/* Audio Speech Reader Button */}
+                <button
+                  type="button"
+                  onClick={speakCaptcha}
+                  className={`p-3 rounded-xl border transition-all active:scale-95 shrink-0 ${
+                    isSpeaking
+                      ? 'bg-amber-500 text-white border-amber-600 animate-pulse'
+                      : 'bg-emerald-50 dark:bg-emerald-950/80 text-[#006a4e] dark:text-emerald-300 hover:bg-emerald-100 border-emerald-300 dark:border-emerald-700'
+                  }`}
+                  title="ক্যাপচা কোড শুনুন (Listen Captcha Voice)"
+                >
+                  <Volume2 className="w-5 h-5" />
+                </button>
               </div>
 
-              {/* Captcha Input Input Field */}
+              {/* Captcha Input Field */}
               <div className="flex-1 space-y-1">
                 <div className="relative">
                   <input
                     id="captcha-input"
                     type="text"
-                    placeholder={captchaType === 'code' ? 'ছবিতে প্রদর্শিত কোড লিখুন' : 'গাণিতিক উত্তর লিখুন'}
+                    placeholder={
+                      captchaType === 'code'
+                        ? 'ছবিতে প্রদর্শিত কোড লিখুন'
+                        : captchaType === 'bangla'
+                        ? 'বাংলা বা ইংরেজি সংখ্যায় টাইপ করুন'
+                        : 'গাণিতিক উত্তর লিখুন'
+                    }
                     value={captchaInput}
                     onChange={(e) => {
-                      setCaptchaInput(captchaType === 'code' ? e.target.value.toUpperCase() : e.target.value.replace(/\D/g, ''));
+                      setCaptchaInput(captchaType === 'code' ? e.target.value.toUpperCase() : e.target.value);
                       if (captchaError) setCaptchaError('');
                     }}
                     maxLength={10}
@@ -545,7 +660,11 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                   </p>
                 ) : (
                   <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    {captchaType === 'code' ? 'ছোট বা বড় হাতের ইংরেজি অক্ষর লিখুন' : 'সংখ্যায় সঠিক যোগফল লিখুন'}
+                    {captchaType === 'code'
+                      ? 'ইংরেজি বর্ণ ও সংখ্যা লিখুন'
+                      : captchaType === 'bangla'
+                      ? 'বাংলা বা ইংরেজি যেকোনো সংখ্যায় লিখুন (যেমন: ৫ বা 5)'
+                      : 'সঠিক গাণিতিক সংখ্যায় উত্তর লিখুন'}
                   </p>
                 )}
               </div>
